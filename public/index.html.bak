@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html lang="sl">
+<head>
+  <meta charset="UTF-8">
+  <title>Naloži dokument</title>
+</head>
+<body>
+  <h1>Naloži dokument za prevod</h1>
+  <form action="/upload" method="POST" enctype="multipart/form-data">
+    <input type="file" name="dokument" accept=".pdf,.docx" required />
+    <button type="submit">Naloži</button>
+  </form>
+</body>
+</html>

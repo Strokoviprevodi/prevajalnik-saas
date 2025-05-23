@@ -6,9 +6,9 @@
 </head>
 <body>
   <h1>Naloži dokument za prevod</h1>
-  <form action="/upload" method="POST" enctype="multipart/form-data">
-    <input type="file" name="dokument" accept=".pdf,.docx" required />
-    <button type="submit">Naloži</button>
-  </form>
+  <form action="/api/translate" method="POST" enctype="multipart/form-data">
+	<input type="file" name="dokument" required />
+	<button type="submit">Prevedi</button>
+</form>
 </body>
 </html>
