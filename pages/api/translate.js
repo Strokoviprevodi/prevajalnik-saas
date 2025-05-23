@@ -1,5 +1,5 @@
-import { IncomingForm } from 'formidable';
-import fs from 'fs';
+import formidable from 'formidable';
+import fs from 'fs/promises';
 import { OpenAI } from 'openai';
 import { Document, Packer, Paragraph, TextRun } from 'docx';
 
@@ -18,39 +18,41 @@ export default async function handler(req, res) {
     return res.status(405).send('Method Not Allowed');
   }
 
-  const form = new IncomingForm({ keepExtensions: true });
+  const form = new formidable.IncomingForm({ keepExtensions: true });
 
   form.parse(req, async (err, fields, files) => {
-    if (err) return res.status(500).send('Napaka pri nalaganju datoteke');
+    if (err) {
+      console.error(err);
+      return res.status(500).send('Napaka pri nalaganju datoteke');
+    }
 
-    const file = files.dokument;
+    const file = files.dokument?.[0];
     if (!file) return res.status(400).send('Ni datoteke.');
 
-    const filePath = file[0].filepath;
-    const buffer = fs.readFileSync(filePath);
-    const text = buffer.toString('utf-8');
-
     try {
-      const gptResponse = await openai.chat.completions.create({
-        model: "gpt-4o",
+      const buffer = await fs.readFile(file.filepath);
+      const besedilo = buffer.toString('utf-8');
+
+      const gpt = await openai.chat.completions.create({
+        model: 'gpt-4o',
         messages: [
           {
-            role: "system",
-            content: "Prevedi naslednje tehnično besedilo iz slovenščine v nemščino. Ohrani strukturo in ton.",
+            role: 'system',
+            content: 'Prevedi naslednje tehnično besedilo iz slovenščine v nemščino. Ohrani strukturo in ton.',
           },
           {
-            role: "user",
-            content: text,
+            role: 'user',
+            content: besedilo,
           },
         ],
       });
 
-      const translatedText = gptResponse.choices[0].message.content;
+      const prevod = gpt.choices[0].message.content;
 
       const doc = new Document({
         sections: [
           {
-            children: translatedText.split('\n').map(line =>
+            children: prevod.split('\n').map(line =>
               new Paragraph({
                 children: [new TextRun(line)],
               })
