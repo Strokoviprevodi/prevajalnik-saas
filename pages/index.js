@@ -1,11 +1,16 @@
 export default function Home() {
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    const res = await fetch('/api/translate', { method: 'POST' });
+    const data = await res.json();
+    alert(data.message);
+  };
+
   return (
-    <div style={{ padding: 40 }}>
+    <div style={{ padding: '2rem', fontFamily: 'Arial' }}>
       <h1>Naloži dokument za prevod</h1>
-      <form action="/api/translate" method="POST" encType="multipart/form-data">
-        <input type="file" name="dokument" required />
-        <br /><br />
-        <button type="submit">Prevedi</button>
+      <form onSubmit={handleSubmit}>
+        <button type="submit">Preveri API</button>
       </form>
     </div>
   );
